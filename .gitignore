@@ -1,13 +1,13 @@
-# Compiled Object files
-*.slo
-*.lo
+# hidden files or directorys
+.*
+.*/ 
+
+# c/c++ binary
 *.o
-
-# Compiled Dynamic libraries
 *.so
-*.dylib
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
+# python bytecode
+*.py[cod]
+
+# project
+*_server
