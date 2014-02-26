@@ -36,15 +36,16 @@ public:
 int main(int argc, char **argv) {
 	int port = 9090;
 	int workerCount = 100;
+
 	shared_ptr<SharedServiceHandler> handler(new SharedServiceHandler());
 	shared_ptr<TProcessor> processor(new SharedServiceProcessor(handler));
 	shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
 	shared_ptr<TTransportFactory> transportFactory(
 			new TBufferedTransportFactory());
 	shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+
 	shared_ptr<ThreadManager> threadManager =
 			ThreadManager::newSimpleThreadManager(workerCount);
-
 	shared_ptr<PosixThreadFactory> threadFactory =
 			shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
 	threadManager->threadFactory(threadFactory);

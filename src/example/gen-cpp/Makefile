@@ -1,30 +1,31 @@
-CXXFLAGS := -Wall
+LIB_DIR = ../../lib/cpp
 
-INC := -I/usr/include/curl -I/usr/include/openssl -I/usr/include/boost -I/usr/local/include/thrift \
-	-I/usr/local/include
+CXXFLAGS = -Wall
 
-LIB := -L/usr/lib/ -lcurl -lssl -lm -L/usr/local/lib -lthrift
+INC = -I/usr/include/curl -I/usr/include/openssl -I/usr/include/boost -I/usr/local/include \
+	-I/usr/local/include/thrift -I${HOME}/zookeeper/include -I${LIB_DIR}
 
-GEN_RC = Calculator.cpp shared_constants.cpp shared_types.cpp SharedService.cpp \
-	tutorial_constants.cpp tutorial_types.cpp
+LIB = -L/usr/lib/ -lgflags -L/usr/local/lib -lthrift -L${HOME}/zookeeper/lib -lzookeeper_mt
 
-GEN_OBJ = $(patsubst %.cpp,%.o, $(GEN_RC))
+SRC = ${wildcard *.cpp} ${wildcard ${LIB_DIR}/*.cpp}
+
+OBJ = ${patsubst %.cpp,%.o,${SRC}}
 
 TARGET = Calculator_server SharedService_server
 
 .PHONY: all clean
 
-all: $(TARGET)
+all: ${TARGET}
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $< -o $@
+	${CXX} ${CXXFLAGS} ${INC} -c $< -o $@
 
-Calculator_server: Calculator_server.o $(GEN_OBJ)
-	$(CXX) $^ -o $@ $(LIB)
+Calculator_server: ${patsubst SharedService_server.o,,${OBJ}}
+	${CXX} $^ ${LIB} -o $@
 
-SharedService_server: SharedService_server.o $(GEN_OBJ)
-	$(CXX) $^ -o $@ $(LIB)
+SharedService_server: ${patsubst Calculator_server.o,,${OBJ}}
+	${CXX} $^ ${LIB} -o $@
 
 clean:
-	$(RM) *.o $(TARGET)
+	${RM} ${OBJ}
 	
