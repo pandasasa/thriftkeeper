@@ -18,18 +18,21 @@ namespace thriftkeeper {
 
 class ThriftKeeper {
 
+public:
+	ThriftKeeper(const string zkHost, ZooLogLevel zkDebugLevel = ZOO_LOG_LEVEL_DEBUG);
+	bool registerServiceNode(const string serviceName, const string nodeName = "",
+		const string nodeData = "");
+	bool reRegisterServiceNode();
+	string getNodePath();
+
 private:
 	zhandle_t *zh;
-	string servicePath;
+	string serviceName;
+	string nodeName;
+	string nodeData;
+	bool _registered;
 
-public:
-	ThriftKeeper(const string host, const string serviceName,
-		ZooLogLevel debugLevel = ZOO_LOG_LEVEL_DEBUG);
-	bool registerServiceNode(string nodeName = "", const string data = "");
-
-private:
-	static void watcherCallback(zhandle_t *zh, int type, int state,
-		const char *path, void *watcherCtx);
+	bool _registerServiceNode();
 };
 
 }

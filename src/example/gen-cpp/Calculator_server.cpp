@@ -78,11 +78,12 @@ DEFINE_string(zk_node_name, "", "Name of this node, it will be the hostname if "
 int main(int argc, char **argv) {
 	google::ParseCommandLineFlags(&argc, &argv, true);
 
-	ThriftKeeper tk(FLAGS_zk_host, FLAGS_zk_service_name, (ZooLogLevel) FLAGS_zk_debug_level);
-	if (!tk.registerServiceNode(FLAGS_zk_node_name)) {
+	ThriftKeeper tk(FLAGS_zk_host, (ZooLogLevel) FLAGS_zk_debug_level);
+	if (!tk.registerServiceNode(FLAGS_zk_service_name, FLAGS_zk_node_name)) {
 		cerr << "register service node failed" << endl;
 		exit(1);
 	}
+	cerr << "register service node succeed" << endl;
 
 	shared_ptr<CalculatorHandler> handler(new CalculatorHandler());
 	shared_ptr<TProcessor> processor(new CalculatorProcessor(handler));

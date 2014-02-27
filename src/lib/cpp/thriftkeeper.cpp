@@ -15,36 +15,74 @@ using namespace std;
 
 namespace thriftkeeper {
 
-ThriftKeeper::ThriftKeeper(const string host, const string serviceName,
-	ZooLogLevel debugLevel) {
-	zoo_set_debug_level(debugLevel);
+static ThriftKeeper *pTk;
 
-	zh = zookeeper_init(host.c_str(), ThriftKeeper::watcherCallback, 1000,
-		0, NULL, 0);
+void zkWatcherCallback(zhandle_t *zh, int type, int state, const char *path,
+	void *watcherCtx) {
+	cerr << "notification received, type - " << type << ", state - "
+		<< state << ", path - " << path << endl;
 
-	servicePath = "/thriftkeeper/" + serviceName;
+	if (type == ZOO_SESSION_EVENT) {
+		if (state == ZOO_EXPIRED_SESSION_STATE) {
+			if (pTk->reRegisterServiceNode()) {
+				cerr << "session expired and register succeed" << endl;
+			} else {
+				cerr << "session expired but register failed" << endl;
+			}
+		}
+	}
 }
 
-bool ThriftKeeper::registerServiceNode(string nodeName, const string data) {
+ThriftKeeper::ThriftKeeper(const string zkHost, ZooLogLevel zkDebugLevel):
+	_registered(false) {
+	zoo_set_debug_level(zkDebugLevel);
+
+	pTk = this;
+	zh = zookeeper_init(zkHost.c_str(), zkWatcherCallback, 1000, 0, NULL, 0);
+}
+
+bool ThriftKeeper::registerServiceNode(const string serviceName, const string nodeName,
+	const string nodeData) {
+	this->serviceName = serviceName;
 	if (nodeName == "") {
 		char hostname[128];
 		gethostname(hostname, sizeof(hostname));
-		nodeName = hostname;
+		this->nodeName = hostname;
+	} else {
+		this->nodeName = nodeName;
 	}
-	string path = servicePath + "/providers/" + nodeName;
-	int ret = zoo_create(zh, path.c_str(), data.c_str(), data.length(),
+	this->nodeData = nodeData;
+
+	if (_registerServiceNode()) {
+		_registered = true;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool ThriftKeeper::_registerServiceNode() {
+	string path = getNodePath();
+	int ret = zoo_create(zh, path.c_str(), nodeData.c_str(), nodeData.length(),
 		&ZOO_OPEN_ACL_UNSAFE, ZOO_EPHEMERAL, NULL, 0);
 	if (ret) {
 		cerr << "create node failed, ret - " << ret << endl;
 		return false;
+	} else {
+		return true;
 	}
-	return true;
 }
 
-void ThriftKeeper::watcherCallback(zhandle_t *zh, int type, int state,
-	const char *path, void *watcherCtx) {
-	cout << "notification received, type - " << type << ", state - "
-		<< state << ", path - " << path << endl;
+bool ThriftKeeper::reRegisterServiceNode() {
+	if (!_registered) {
+		return false;
+	}
+
+	return _registerServiceNode();
+}
+
+string ThriftKeeper::getNodePath() {
+	return "/thriftkeeper/" + serviceName + "/providers/" + nodeName;
 }
 
 }
