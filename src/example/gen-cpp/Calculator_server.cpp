@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include <boost/lexical_cast.hpp>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TThreadPoolServer.h>
 #include <thrift/transport/TServerSocket.h>
@@ -11,6 +12,7 @@
 #include <thrift/concurrency/PosixThreadFactory.h>
 #include <thrift/concurrency/ThreadManager.h>
 #include <gflags/gflags.h>
+#include <json/json.h>
 #include <thriftkeeper.h>
 
 #include "Calculator.h"
@@ -78,12 +80,11 @@ DEFINE_string(zk_node_name, "", "Name of this node, it will be the hostname if "
 int main(int argc, char **argv) {
 	google::ParseCommandLineFlags(&argc, &argv, true);
 
-	ThriftKeeper tk(FLAGS_zk_host, (ZooLogLevel) FLAGS_zk_debug_level);
-	if (!tk.registerServiceNode(FLAGS_zk_service_name, FLAGS_zk_node_name)) {
-		cerr << "register service node failed" << endl;
-		exit(1);
-	}
-	cerr << "register service node succeed" << endl;
+	ZooLogLevel zk_debug_level = (ZooLogLevel) FLAGS_zk_debug_level;
+	Json::Value data;
+	data["address"] =  "127.0.0.1:" + boost::lexical_cast<string>(FLAGS_port);
+	ThriftKeeper tk(FLAGS_zk_host, FLAGS_zk_service_name, FLAGS_zk_node_name,
+		data, true, zk_debug_level);
 
 	shared_ptr<CalculatorHandler> handler(new CalculatorHandler());
 	shared_ptr<TProcessor> processor(new CalculatorProcessor(handler));

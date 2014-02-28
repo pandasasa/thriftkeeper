@@ -11,6 +11,7 @@
 #include <string>
 
 #include <zookeeper/zookeeper.h>
+#include <json/json.h>
 
 using namespace std;
 
@@ -19,20 +20,23 @@ namespace thriftkeeper {
 class ThriftKeeper {
 
 public:
-	ThriftKeeper(const string zkHost, ZooLogLevel zkDebugLevel = ZOO_LOG_LEVEL_DEBUG);
-	bool registerServiceNode(const string serviceName, const string nodeName = "",
-		const string nodeData = "");
-	bool reRegisterServiceNode();
-	string getNodePath();
+	int state_;
+
+	ThriftKeeper(const string hosts = "127.0.0.1:2181", const string service_name = "tutorial",
+		const string node_name = "", Json::Value node_data = Json::objectValue,
+		bool is_provider = true, ZooLogLevel zk_debug_level = ZOO_LOG_LEVEL_DEBUG);
+	bool set_node_data_item(string key, Json::Value value);
+	bool register_node();
 
 private:
-	zhandle_t *zh;
-	string serviceName;
-	string nodeName;
-	string nodeData;
-	bool _registered;
+	zhandle_t *zh_;
+	string service_name_;
+	string node_name_;
+	Json::Value node_data_;
+	bool is_provider_;
 
-	bool _registerServiceNode();
+	string get_service_path();
+	string get_node_path();
 };
 
 }

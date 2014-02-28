@@ -2,10 +2,9 @@ LIB_DIR = ../../lib/cpp
 
 CXXFLAGS = -Wall
 
-INC = -I/usr/include/curl -I/usr/include/openssl -I/usr/include/boost -I/usr/local/include \
-	-I/usr/local/include/thrift -I${HOME}/zookeeper/include -I${LIB_DIR}
+INC = -I${HOME}/include -I/usr/local/include -I${LIB_DIR}
 
-LIB = -L/usr/lib/ -lgflags -L/usr/local/lib -lthrift -L${HOME}/zookeeper/lib -lzookeeper_mt
+LIB = -L${HOME}/lib -lzookeeper_mt -ljson -L/usr/lib/ -lgflags -L/usr/local/lib -lthrift
 
 SRC = ${wildcard *.cpp} ${wildcard ${LIB_DIR}/*.cpp}
 
