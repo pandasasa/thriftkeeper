@@ -1,14 +1,14 @@
-LIB_DIR = ../../lib/cpp
+LIB_DIR = ../../lib/c
 
 CXXFLAGS = -Wall
 
-INC = -I${HOME}/include -I/usr/local/include -I${LIB_DIR}
+INC = -I/usr/local/include -I${LIB_DIR}
 
-LIB = -L${HOME}/lib -lzookeeper_mt -ljson -L/usr/lib/ -lgflags -L/usr/local/lib -lthrift
+LIB = -L/usr/lib/ -lgflags -L/usr/local/lib -lthrift -lzookeeper_mt -ljson-c
 
-SRC = ${wildcard *.cpp} ${wildcard ${LIB_DIR}/*.cpp}
+SRC = ${wildcard *.cpp} ${wildcard ${LIB_DIR}/*.c}
 
-OBJ = ${patsubst %.cpp,%.o,${SRC}}
+OBJ = ${patsubst %.cpp,%.o,${patsubst %.c,%.o,${SRC}}}
 
 TARGET = Calculator_server SharedService_server
 
@@ -17,6 +17,9 @@ TARGET = Calculator_server SharedService_server
 all: ${TARGET}
 
 %.o: %.cpp
+	${CXX} ${CXXFLAGS} ${INC} -c $< -o $@
+
+%.o: %.c
 	${CXX} ${CXXFLAGS} ${INC} -c $< -o $@
 
 Calculator_server: ${patsubst SharedService_server.o,,${OBJ}}

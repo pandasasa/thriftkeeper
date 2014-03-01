@@ -3,7 +3,6 @@ import random
 import bisect
 import itertools
 import json
-import pdb
 import socket
 
 from kazoo.client import KazooClient

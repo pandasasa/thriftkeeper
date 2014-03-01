@@ -12,7 +12,7 @@
 #include <thrift/concurrency/PosixThreadFactory.h>
 #include <thrift/concurrency/ThreadManager.h>
 #include <gflags/gflags.h>
-#include <json/json.h>
+#include <json-c/json.h>
 #include <thriftkeeper.h>
 
 #include "Calculator.h"
@@ -29,7 +29,6 @@ using namespace ::apache::thrift::concurrency;
 
 using namespace ::tutorial;
 using shared::SharedStruct;
-using thriftkeeper::ThriftKeeper;
 
 class CalculatorHandler: virtual public CalculatorIf {
 public:
@@ -68,23 +67,23 @@ public:
 
 DEFINE_int32(port, 9090, "Port to listen");
 DEFINE_int32(worker_count, 100, "Number of threads to process request");
-DEFINE_string(zk_host, "127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183",
+DEFINE_string(zk_hosts, "127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183",
 	"Addresses of zookeeper service");
 DEFINE_string(zk_service_name, "tutorial", "Name of this service in zookeeper "
 	"service");
-DEFINE_int32(zk_debug_level, 3, "Log level of zookeeper, 1 to 4 each "
-	"means error, warn, info and debug");
-DEFINE_string(zk_node_name, "", "Name of this node, it will be the hostname if "
-	"not supply");
+DEFINE_string(zk_node_name, "", "Name of this node, it will be the hostname if empty");
+DEFINE_int32(log_level, 3, "Log level, 1 to 4 each means error, warn, info and debug");
 
 int main(int argc, char **argv) {
 	google::ParseCommandLineFlags(&argc, &argv, true);
 
-	ZooLogLevel zk_debug_level = (ZooLogLevel) FLAGS_zk_debug_level;
-	Json::Value data;
-	data["address"] =  "127.0.0.1:" + boost::lexical_cast<string>(FLAGS_port);
-	ThriftKeeper tk(FLAGS_zk_host, FLAGS_zk_service_name, FLAGS_zk_node_name,
-		data, true, zk_debug_level);
+	json_object *data = json_object_new_object();
+	char address[32];
+	sprintf(address, "127.0.0.1:%d", FLAGS_port);
+	json_object_object_add(data, "address", json_object_new_string(address));
+	tk_init(FLAGS_zk_hosts.c_str(), FLAGS_zk_service_name.c_str(), FLAGS_zk_node_name.c_str(),
+		data, true);
+	tk_set_log_level((zk_log_level_t) FLAGS_log_level);
 
 	shared_ptr<CalculatorHandler> handler(new CalculatorHandler());
 	shared_ptr<TProcessor> processor(new CalculatorProcessor(handler));

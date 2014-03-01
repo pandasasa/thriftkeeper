@@ -4,7 +4,6 @@ import sys
 import time
 import argparse
 import logging
-import pdb
 
 from thrift.transport import TTransport
 from thrift.transport import TSocket

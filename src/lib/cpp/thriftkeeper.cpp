@@ -15,7 +15,7 @@ using namespace std;
 
 namespace thriftkeeper {
 
-static ThriftKeeper *ptk;
+ThriftKeeper *ptk;
 
 void ZkWatcher(zhandle_t *zh, int type, int state, const char *path,
 	void *watcherCtx) {
