@@ -126,7 +126,7 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     provider address, host - 127.0.0.1, port - 9092
     called procedure ping 6 times
     ...
-    // here we stopped server node1
+    // here we stopped server1, it will be no more calling to server1
     provider node1 changed, type - 2, state - 3, path - /thriftkeeper/tutorial/providers/node1
     providers changed, type - 4, state - 3, path - /thriftkeeper/tutorial/providers
     provider address, host - 127.0.0.1, port - 9093
@@ -137,7 +137,7 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     called procedure ping 12 times
     provider address, host - 127.0.0.1, port - 9092
     ...
-    // here we restarted server node1
+    // here we restarted server1, calling to server1 will appear again
     providers changed, type - 4, state - 3, path - /thriftkeeper/tutorial/providers
     provider address, host - 127.0.0.1, port - 9091
     called procedure ping 19 times
