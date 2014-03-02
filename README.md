@@ -13,6 +13,21 @@ It uses [thrift][thrift] as the rpc framework, and [zookeeper][zookeeper] as the
 *  auto fail over, if a rpc server down, client will be noticed in few seconds, and no new calling will send to this server.
 *  monitoring and managing, current servers and clients online, connections on each server, number of callings received by each server etc, everything you want to know can found on the web admin console.
 
+## Progress
+
+### Finished
+
+ *  server part of c api
+ *  client part of python api
+
+### Todo
+
+ *  client part of c api
+ *  server part of python api
+ *  both client and server part of php api
+ *  monitoring, such as current servers and clients online, connections on each server, number of callings received by each server etc.
+ *  managing, such as kick off unfriendly clients, limit the calling rates of client etc.
+
 ## Usage
 
 ### Directory structure
@@ -146,21 +161,6 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     ...
     provider address, host - 127.0.0.1, port - 9092
     </pre>
-
-## Progress
-
-### Finished
-
- *  server part of c api
- *  client part of python api
-
-### Todo
-
- *  client part of c api
- *  server part of python api
- *  both client and server part of php api
- *  monitoring, such as current servers and clients online, connections on each server, number of callings received by each server etc.
- *  managing, such as kick off unfriendly clients, limit the calling rates of client etc.
 
 [thrift]: http://thrift.apache.org/ "Thrift"
 [zookeeper]: http://zookeeper.apache.org/ "ZooKeeper" 
