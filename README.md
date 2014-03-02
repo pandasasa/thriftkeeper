@@ -13,21 +13,6 @@ It uses [thrift][thrift] as the rpc framework, and [zookeeper][zookeeper] as the
 *  auto fail over, if a rpc server down, client will be noticed in few seconds, and no new calling will send to this server.
 *  monitoring and managing, current servers and clients online, connections on each server, number of callings received by each server etc, everything you want to know can found on the web admin console.
 
-## Progress
-
-### Finished
-
- *  server part of c api
- *  client part of python api
-
-### Todo
-
- *  client part of c api
- *  server part of python api
- *  both client and server part of php api
- *  monitoring, such as current servers and clients online, connections on each server, number of callings received by each server etc.
- *  managing, such as kick off unfriendly clients, limit the calling rates of client etc.
-
 ## Usage
 
 ### Directory structure
@@ -36,19 +21,43 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
 
 <pre>
 .
+├── LICENSE
+├── README.md
 └── src
     ├── example
     │   ├── gen-cpp
+    │   │   ├── Calculator.cpp
+    │   │   ├── Calculator.h
+    │   │   ├── Calculator_server
+    │   │   ├── Calculator_server.cpp
+    │   │   ├── Makefile
+    │   │   ├── SharedService.cpp
+    │   │   ├── SharedService.h
+    │   │   ├── SharedService_server
+    │   │   ├── SharedService_server.cpp
+    │   │   ├── shared_constants.cpp
+    │   │   ├── shared_constants.h
+    │   │   ├── shared_types.cpp
+    │   │   ├── shared_types.h
+    │   │   ├── tutorial_constants.cpp
+    │   │   ├── tutorial_constants.h
+    │   │   ├── tutorial_types.cpp
+    │   │   └── tutorial_types.h
     │   ├── gen-php
+    │   ├── gen-py
+    │   │   ├── __init__.py
+    │   │   ├── client.py
     │   │   ├── shared
     │   │   └── tutorial
-    │   └── gen-py
-    │       ├── shared
-    │       └── tutorial
+    │   ├── shared.thrift
+    │   └── tutorial.thrift
     └── lib
         ├── c
+        │   ├── thriftkeeper.c
+        │   └── thriftkeeper.h
         ├── php
         └── python
+            ├── thriftkeeper.py
 </pre>
 
 ### Runing results
@@ -78,7 +87,7 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     > cd src/example/gen-cpp
     > make
     > ./Calculator_server --help
-    > ./Calculator_server -port=9091 -zk_node_name=node1  ~/data/thriftkeeper/tutorial_node1.log 2>&1 &
+    > ./Calculator_server -port=9091 -zk_node_name=node1 ~/data/thriftkeeper/tutorial_node1.log 2>&1 &
     > ./Calculator_server -port=9092 -zk_node_name=node2 ~/data/thriftkeeper/tutorial_node1.log 2>&1 &
     > ./Calculator_server -port=9093 -zk_node_name=node4 ~/data/thriftkeeper/tutorial_node1.log 2>&1 &
     </pre>
@@ -117,7 +126,7 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     provider address, host - 127.0.0.1, port - 9092
     called procedure ping 6 times
     ...
-    **here we stopped server node1**
+    // here we stopped server node1
     provider node1 changed, type - 2, state - 3, path - /thriftkeeper/tutorial/providers/node1
     providers changed, type - 4, state - 3, path - /thriftkeeper/tutorial/providers
     provider address, host - 127.0.0.1, port - 9093
@@ -128,7 +137,7 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     called procedure ping 12 times
     provider address, host - 127.0.0.1, port - 9092
     ...
-    **here we restarted server node1**
+    // here we restarted server node1
     providers changed, type - 4, state - 3, path - /thriftkeeper/tutorial/providers
     provider address, host - 127.0.0.1, port - 9091
     called procedure ping 19 times
@@ -137,6 +146,21 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     ...
     provider address, host - 127.0.0.1, port - 9092
     </pre>
+
+## Progress
+
+### Finished
+
+ *  server part of c api
+ *  client part of python api
+
+### Todo
+
+ *  client part of c api
+ *  server part of python api
+ *  both client and server part of php api
+ *  monitoring, such as current servers and clients online, connections on each server, number of callings received by each server etc.
+ *  managing, such as kick off unfriendly clients, limit the calling rates of client etc.
 
 [thrift]: http://thrift.apache.org/ "Thrift"
 [zookeeper]: http://zookeeper.apache.org/ "ZooKeeper" 
