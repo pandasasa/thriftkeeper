@@ -83,16 +83,17 @@ class ThriftKeeper:
         return True
         
     def _get_provider(self, strategy=LOAD_BANLANCE_STRATEGY_RANDOM):
-        providers = self._get_providers()
+        if not hasattr(self, '_providers'):
+            self._get_providers()
         
-        if len(providers) == 0:
+        if len(self._providers) == 0:
             self._logger.error('no provider found')
             return None
         
         if strategy == LOAD_BANLANCE_STRATEGY_RANDOM:
-            provider = random.choice(providers)
+            provider = random.choice(self._providers)
         elif strategy == LOAD_BANLANCE_STRATEGY_WEIGHT:
-            provider = ThriftKeeper._choose_provider_by_weight(providers)
+            provider = ThriftKeeper._choose_provider_by_weight(self._providers)
         
         return provider
     
@@ -108,21 +109,20 @@ class ThriftKeeper:
                 self._node_name)
     
     def _get_providers(self):
-        if not hasattr(self, '_providers'):
-            providers_path = '{}/providers'.format(self._get_service_path())
-            try:
-                children = zookeeper.get_children(self._zh, providers_path, 
-                    self._get_providers_watcher())
-            except zookeeper.ZooKeeperException as e:
-                self._logger.error("create node failed, exception - {}".format(e))
-                return []
-            
-            self._providers = []
-            for name in children:
-                data, stat = self._get_provider_data(name)
-                self._providers.append({'name': name, 'data': data, 'stat': stat})
+        providers_path = '{}/providers'.format(self._get_service_path())
+        try:
+            children = zookeeper.get_children(self._zh, providers_path, 
+                self._get_providers_watcher())
+        except zookeeper.ZooKeeperException as e:
+            self._logger.error("create node failed, exception - {}".format(e))
+            return []
         
-        return self._providers
+        providers = []
+        for name in children:
+            data, stat = self._get_provider_data(name)
+            providers.append({'name': name, 'data': data, 'stat': stat})
+        
+        self._providers = providers
     
     def _get_provider_data(self, name):
         provider_path = '{}/providers/{}'.format(self._get_service_path(), name)
@@ -139,8 +139,8 @@ class ThriftKeeper:
             self._logger.info('providers changed, type - {}, state - {}, path - {}'
                 .format(type, state, path))
             
-            if type == zookeeper.DELETED_EVENT:
-                self._providers = []
+            if type == zookeeper.CHILD_EVENT:
+                self._get_providers()
         
         return watcher
     
@@ -150,10 +150,10 @@ class ThriftKeeper:
                 .format(name, type, state, path))
             
             if type == zookeeper.CHANGED_EVENT:
-                self._get_provider_data(name)
-            if type == zookeeper.DELETED_EVENT:
-                self._providers = [provider for provider in self._providers 
-                    if provider['name'] != name]
+                data, stat = self._get_provider_data(name)
+                for provider in self._providers:
+                    if provider['name'] == name:
+                        provider['data'], provider['stat'] = data, stat
         
         return watcher
     

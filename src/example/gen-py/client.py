@@ -21,7 +21,7 @@ logger.addHandler(logging.StreamHandler())
 def rpc(tk, procedure, params, logger):
     host, port = tk.get_provider_address().split(':')
     port = int(port)
-    logger.debug("provider address, host - {}, port - {}".format(host, port))
+    logger.info("provider address, host - {}, port - {}".format(host, port))
 
     socket = TSocket.TSocket(host, port)
     transport = TTransport.TBufferedTransport(socket)
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         default='127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183',
         help='the hosts of zookeeper')
     parser.add_argument('--service_name', dest='service_name', action='store', default='tutorial',
-        help='the nam of rpc service to request')
+        help='the name of rpc service to request')
     parser.add_argument('--count', dest='count', action='store', default=0, type=int,
         help='how many times to request, default to loop forever')
     parser.add_argument('--interval', dest='interval', action='store', default=1, type=int,
