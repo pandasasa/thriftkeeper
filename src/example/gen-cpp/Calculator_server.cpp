@@ -78,12 +78,12 @@ int main(int argc, char **argv) {
 	google::ParseCommandLineFlags(&argc, &argv, true);
 
 	json_object *data = json_object_new_object();
-	char address[32];
+	char address[128];
 	sprintf(address, "127.0.0.1:%d", FLAGS_port);
 	json_object_object_add(data, "address", json_object_new_string(address));
 	tk_init(FLAGS_zk_hosts.c_str(), FLAGS_zk_service_name.c_str(), FLAGS_zk_node_name.c_str(),
 		data, true);
-	tk_set_log_level((zk_log_level_t) FLAGS_log_level);
+	tk_set_log_level((tk_log_level_t) FLAGS_log_level);
 
 	shared_ptr<CalculatorHandler> handler(new CalculatorHandler());
 	shared_ptr<TProcessor> processor(new CalculatorProcessor(handler));
