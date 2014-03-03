@@ -34,7 +34,7 @@ It uses [thrift][thrift] as the rpc framework, and [zookeeper][zookeeper] as the
 
 The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", and the client api using example is in "src/example/gen-py/client.py".
 
-<pre>
+```
 .
 ├── LICENSE
 ├── README.md
@@ -73,7 +73,7 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
         ├── php
         └── python
             ├── thriftkeeper.py
-</pre>
+```
 
 ### Runing results
 
@@ -85,12 +85,12 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
 
     Start zookeeper service in cluster mode, we started three instances on one machine. Suppose zookeeper installed to your home directory, and  "zoo1.cfg", "zoo2.cfg" and "zoo3.cfg" are config files under  "~/zookeeper/conf".
 
-    <pre>
+    ```
     > cd ~/zookeeper
     > ./bin/zkServer.sh start zoo1.cfg
     > ./bin/zkServer.sh start zoo2.cfg
     > ./bin/zkServer.sh start zoo2.cfg
-    </pre>
+    ```
     
  1. start rpc server
 
@@ -98,24 +98,24 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     
     Go into "src/example/gen-cpp" and run "make" command, if everything ok, you will get the server program "Calculator_server". Start three instances listening at different port and with different node name.
 
-    <pre>
+    ```
     > cd src/example/gen-cpp
     > make
     > ./Calculator_server --help
     > ./Calculator_server -port=9091 -zk_node_name=node1 ~/data/thriftkeeper/tutorial_node1.log 2>&1 &
     > ./Calculator_server -port=9092 -zk_node_name=node2 ~/data/thriftkeeper/tutorial_node1.log 2>&1 &
     > ./Calculator_server -port=9093 -zk_node_name=node4 ~/data/thriftkeeper/tutorial_node1.log 2>&1 &
-    </pre>
+    ```
     
     When starting server, it will firstly register itself on zookeeper as a children of node "/thriftkeeper/tutorial/providers", along with its service address. It will try to register itself again if connection lost, and the node on zookeeper which represent itself will be deleted when server stopped.
 
  1. run client
  
-    Run client script, give procedure argument as "ping", it will continuously call remote procedure "ping".
+    Client is written in python, it needs packages `thrift` and `zc-zookeeper-static`, both can be installed by pip. run client script with procedure argument "ping", it will continuously call remote procedure "ping".
 
     When starting client, it will firstly register itself on zookeeper as a children of node "/thriftkeeper/tutorial/consumers", get all servers that are online, then choose one server by random and call remote procedure continuely. 
 
-    <pre>
+    ```
     > cd src/example/gen-py
     > ./client.py -h
     > ./client.py ping
@@ -127,11 +127,11 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     called procedure ping 4 times
     called procedure ping 5 times
     called procedure ping 6 times
-    </pre>
+    ```
     
     When new server added or some online server down, it will be notified immediately.
  
-    <pre>   
+    ```  
     provider address, host - 127.0.0.1, port - 9091
     called procedure ping 3 times
     provider address, host - 127.0.0.1, port - 9093
@@ -160,7 +160,7 @@ The server api using example is in "src/example/gen-cpp/Calculator_server.cpp", 
     called procedure ping 20 times
     ...
     provider address, host - 127.0.0.1, port - 9092
-    </pre>
+    ```
 
 [thrift]: http://thrift.apache.org/ "Thrift"
 [zookeeper]: http://zookeeper.apache.org/ "ZooKeeper" 
